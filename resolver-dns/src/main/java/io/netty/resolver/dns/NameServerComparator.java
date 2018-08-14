@@ -39,16 +39,16 @@ final class NameServerComparator implements Comparator<InetSocketAddress> {
 
     @Override
     public int compare(InetSocketAddress addr1, InetSocketAddress addr2) {
+        // We dont want to use equals(...) here as we dont want to use the default implementation.
         if (addr1 == addr2) {
             return 0;
         }
+
         if (!addr1.isUnresolved()) {
-            if (!addr2.isUnresolved()) {
-                if (addr1.getAddress().getClass() == addr2.getAddress().getClass()) {
-                    // If both addresses use the same type we will just return 0 to preserve the original order
-                    // when sorting the List.
-                    return 0;
-                }
+            if (!addr2.isUnresolved() && addr1.getAddress().getClass() == addr2.getAddress().getClass()) {
+                // If both addresses use the same type we will just return 0 to preserve the original order
+                // when sorting the List.
+                return 0;
             }
             if (preferredAddressType.isAssignableFrom(addr1.getAddress().getClass())) {
                 if (!addr2.isUnresolved() && preferredAddressType.isAssignableFrom(addr2.getAddress().getClass())) {
@@ -57,14 +57,14 @@ final class NameServerComparator implements Comparator<InetSocketAddress> {
                     return 0;
                 }
                 return -1;
-            } else {
-                if (addr2.isUnresolved()) {
-                    // Prefer the resolved address.
-                    return -1;
-                }
-                return 1;
             }
-        } else if (!addr2.isUnresolved()) {
+            if (addr2.isUnresolved()) {
+                // Prefer the resolved address.
+                return -1;
+            }
+            return 1;
+        }
+        if (!addr2.isUnresolved()) {
             return 1;
         }
         return 0;

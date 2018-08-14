@@ -32,8 +32,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
-import static io.netty.util.internal.ObjectUtil.checkNotNull;
-import static io.netty.util.internal.ObjectUtil.checkPositiveOrZero;
+import static io.netty.util.internal.ObjectUtil.*;
 
 /**
  * Default implementation of {@link AuthoritativeDnsServerCache}, backed by a {@link ConcurrentMap}.
@@ -109,29 +108,11 @@ public class DefaultAuthoritativeDnsServerCache implements AuthoritativeDnsServe
      */
     public DefaultAuthoritativeDnsServerCache(int minTtl, int maxTtl) {
         this.minTtl = Math.min(MAX_SUPPORTED_TTL_SECS, checkPositiveOrZero(minTtl, "minTtl"));
-        this.maxTtl = Math.min(MAX_SUPPORTED_TTL_SECS, checkPositiveOrZero(maxTtl, "maxTtl"));
+        this.maxTtl = Math.min(MAX_SUPPORTED_TTL_SECS, checkPositive(maxTtl, "maxTtl"));
         if (minTtl > maxTtl) {
             throw new IllegalArgumentException(
                     "minTtl: " + minTtl + ", maxTtl: " + maxTtl + " (expected: 0 <= minTtl <= maxTtl)");
         }
-    }
-
-    /**
-     * Returns the minimum TTL of the cached DNS resource records (in seconds).
-     *
-     * @see #maxTtl()
-     */
-    public int minTtl() {
-        return minTtl;
-    }
-
-    /**
-     * Returns the maximum TTL of the cached DNS resource records (in seconds).
-     *
-     * @see #minTtl()
-     */
-    public int maxTtl() {
-        return maxTtl;
     }
 
     @Override
@@ -151,9 +132,6 @@ public class DefaultAuthoritativeDnsServerCache implements AuthoritativeDnsServe
         checkNotNull(hostname, "hostname");
         checkNotNull(address, "address");
         checkNotNull(loop, "loop");
-        if (maxTtl == 0) {
-            return;
-        }
         if (PlatformDependent.javaVersion() >= 7 && address.getHostString() == null) {
             // We only cache addresses that have also a host string as we will need it later when trying to replace
             // unresolved entries in the cache.
@@ -221,12 +199,18 @@ public class DefaultAuthoritativeDnsServerCache implements AuthoritativeDnsServe
                     int i = 0;
                     do {
                         InetSocketAddress address = entryList.get(i);
-                        if (replacedEntry != null || !address.getHostName().equalsIgnoreCase(nameServerName)) {
+                        if (!address.getHostName().equalsIgnoreCase(nameServerName)) {
                             newEntries.add(address);
                         } else {
                             // Replace the old entry.
                             replacedEntry = address;
                             newEntries.add(addr);
+
+                            ++i;
+                            for (; i < entryList.size(); ++i) {
+                                newEntries.add(entryList.get(i));
+                            }
+                            break;
                         }
                     } while (++i < entryList.size());
 

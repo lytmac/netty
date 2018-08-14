@@ -112,7 +112,7 @@ public abstract class DnsServerAddresses {
         return new DefaultDnsServerAddresses("shuffled", addresses) {
             @Override
             public DnsServerAddressStream stream() {
-                return new ShuffledDnsServerAddressStream(addresses.toArray(new InetSocketAddress[0]));
+                return new ShuffledDnsServerAddressStream(addresses);
             }
         };
     }
