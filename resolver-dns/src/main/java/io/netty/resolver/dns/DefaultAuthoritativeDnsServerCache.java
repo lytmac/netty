@@ -229,6 +229,9 @@ public class DefaultAuthoritativeDnsServerCache implements AuthoritativeDnsServe
         }
 
         private void scheduleCacheExpirationIfNeeded(int ttl, EventLoop loop) {
+            // We currently don't calculate a new TTL when we need to retry the CAS as we don't expect this to
+            // be invoked very concurrently and also we use SECONDS anyway. If this ever becomes a problem
+            // we can reconsider.
             for (;;) {
                 ScheduledFuture<?> oldFuture = FUTURE_UPDATER.get(this);
                 if (oldFuture == null || oldFuture.getDelay(TimeUnit.SECONDS) > ttl) {
