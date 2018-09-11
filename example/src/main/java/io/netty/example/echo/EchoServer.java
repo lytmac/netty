@@ -41,7 +41,7 @@ public final class EchoServer {
     public static void main(String[] args) throws Exception {
         // Configure SSL.
         final SslContext sslCtx;
-        if (SSL) {
+        if (SSL) { //是否处理SSL请求
             SelfSignedCertificate ssc = new SelfSignedCertificate();
             sslCtx = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey()).build();
         } else {
@@ -49,26 +49,26 @@ public final class EchoServer {
         }
 
         // Configure the server.
-        EventLoopGroup bossGroup = new NioEventLoopGroup(1);
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
+        EventLoopGroup bossGroup = new NioEventLoopGroup(1); //监听套接字用来执行ACCEPT操作
+        EventLoopGroup workerGroup = new NioEventLoopGroup();           //连接套接字用来执行I/O操作
         final EchoServerHandler serverHandler = new EchoServerHandler();
         try {
             ServerBootstrap b = new ServerBootstrap();
-            b.group(bossGroup, workerGroup)
-             .channel(NioServerSocketChannel.class)
-             .option(ChannelOption.SO_BACKLOG, 100)
-             .handler(new LoggingHandler(LogLevel.INFO))
-             .childHandler(new ChannelInitializer<SocketChannel>() {
-                 @Override
-                 public void initChannel(SocketChannel ch) throws Exception {
-                     ChannelPipeline p = ch.pipeline();
-                     if (sslCtx != null) {
-                         p.addLast(sslCtx.newHandler(ch.alloc()));
-                     }
-                     //p.addLast(new LoggingHandler(LogLevel.INFO));
-                     p.addLast(serverHandler);
-                 }
-             });
+            b.group(bossGroup, workerGroup)                                       //ServerBootstrap设定EventLoopGroup
+                    .channel(NioServerSocketChannel.class)                        //指定Channel，因为是Server端，故Channel是ServerSocketChannel，为什么要通过反射来处理呢？
+                    .option(ChannelOption.SO_BACKLOG, 100)                 //指定内核backlog的长度
+                    .handler(new LoggingHandler(LogLevel.INFO))                   //指定BossGroup的Handler
+                    .childHandler(new ChannelInitializer<SocketChannel>() {       //指定workerGroup的Handler
+                        @Override
+                        public void initChannel(SocketChannel ch) throws Exception {
+                            ChannelPipeline p = ch.pipeline();
+                            if (sslCtx != null) {
+                                p.addLast(sslCtx.newHandler(ch.alloc()));
+                            }
+                            //p.addLast(new LoggingHandler(LogLevel.INFO));
+                            p.addLast(serverHandler);
+                        }
+                    });
 
             // Start the server.
             ChannelFuture f = b.bind(PORT).sync();

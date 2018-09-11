@@ -249,7 +249,7 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
     /**
      * Create a new {@link Channel} and bind it.
      */
-    public ChannelFuture bind(int inetPort) {
+    public ChannelFuture bind(int inetPort) { //监听套接字绑定IP+PORT
         return bind(new InetSocketAddress(inetPort));
     }
 
@@ -279,7 +279,7 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
     }
 
     private ChannelFuture doBind(final SocketAddress localAddress) {
-        final ChannelFuture regFuture = initAndRegister();
+        final ChannelFuture regFuture = initAndRegister(); //将ServerSocketChannel注册到Selector上监听客户端连接
         final Channel channel = regFuture.channel();
         if (regFuture.cause() != null) {
             return regFuture;
@@ -317,7 +317,7 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
     final ChannelFuture initAndRegister() {
         Channel channel = null;
         try {
-            channel = channelFactory.newChannel();
+            channel = channelFactory.newChannel();  //channelFactory在Bootstrap初始化时通过channel()指定了channelFactory的生产类型，在这里执行创建操作
             init(channel);
         } catch (Throwable t) {
             if (channel != null) {
