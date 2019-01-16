@@ -268,7 +268,7 @@ public abstract class AbstractByteBuf extends ByteBuf {
 
     final void ensureWritable0(int minWritableBytes) {
         ensureAccessible();
-        if (minWritableBytes <= writableBytes()) {
+        if (minWritableBytes <= writableBytes()) { //可用空间足够写入就直接返回
             return;
         }
 
@@ -278,7 +278,7 @@ public abstract class AbstractByteBuf extends ByteBuf {
                     writerIndex, minWritableBytes, maxCapacity, this));
         }
 
-        // Normalize the current capacity to the power of 2.
+        // Normalize the current capacity to the power of 2.这里只是计算了
         int newCapacity = alloc().calculateNewCapacity(writerIndex + minWritableBytes, maxCapacity);
 
         // Adjust to the new capacity.
@@ -293,7 +293,7 @@ public abstract class AbstractByteBuf extends ByteBuf {
                     "minWritableBytes: %d (expected: >= 0)", minWritableBytes));
         }
 
-        if (minWritableBytes <= writableBytes()) {
+        if (minWritableBytes <= writableBytes()) { //
             return 0;
         }
 

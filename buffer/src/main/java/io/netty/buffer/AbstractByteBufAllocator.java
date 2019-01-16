@@ -252,7 +252,7 @@ public abstract class AbstractByteBufAllocator implements ByteBufAllocator {
         if (minNewCapacity < 0) {
             throw new IllegalArgumentException("minNewCapacity: " + minNewCapacity + " (expected: 0+)");
         }
-        if (minNewCapacity > maxCapacity) {
+        if (minNewCapacity > maxCapacity) { //maxCapacity是指定的最大缓存区容量
             throw new IllegalArgumentException(String.format(
                     "minNewCapacity: %d (expected: not greater than maxCapacity(%d)",
                     minNewCapacity, maxCapacity));

@@ -48,6 +48,13 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
     /*=============================================区别于父类的字段===================================================*/
     private final Map<ChannelOption<?>, Object> childOptions = new LinkedHashMap<ChannelOption<?>, Object>();
     private final Map<AttributeKey<?>, Object> childAttrs = new LinkedHashMap<AttributeKey<?>, Object>();
+
+    /* ================================================================ */
+    /* 父类中有自己的group(EventLoopGroup)和handler(ChannelHandler)     */
+    /* volatile EventLoopGroup group;                                   */
+    /* private volatile ChannelHandler handler;                         */
+    /* ================================================================ */
+
     private volatile EventLoopGroup childGroup;
     private volatile ChannelHandler childHandler;
     /*================================================================================================================*/
@@ -140,6 +147,11 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
         return this;
     }
 
+    /**
+     * 将在Bootstrap中配置的参数(ChannelOption)初始化给channel
+     * @param channel
+     * @throws Exception
+     */
     @Override
     void init(Channel channel) throws Exception {
         final Map<ChannelOption<?>, Object> options = options0();

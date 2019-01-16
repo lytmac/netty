@@ -47,14 +47,14 @@ public final class DiscardServer {
             sslCtx = null;
         }
 
-        EventLoopGroup bossGroup = new NioEventLoopGroup(1);
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
+        EventLoopGroup bossGroup = new NioEventLoopGroup(1);   // 赋值给父类AbstractBootstrap,用于完成ACCEPT操作 serverSocket
+        EventLoopGroup workerGroup = new NioEventLoopGroup();            // 赋值给自身ServerBootstrap,用于完成IO操作 socket
         try {
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup)
              .channel(NioServerSocketChannel.class)
-             .handler(new LoggingHandler(LogLevel.INFO))
-             .childHandler(new ChannelInitializer<SocketChannel>() {
+             .handler(new LoggingHandler(LogLevel.INFO))                 // handler()是父类AbstractBootstrap的方法
+             .childHandler(new ChannelInitializer<SocketChannel>() {     // 处理具体的业务
                  @Override
                  public void initChannel(SocketChannel ch) {
                      ChannelPipeline p = ch.pipeline();

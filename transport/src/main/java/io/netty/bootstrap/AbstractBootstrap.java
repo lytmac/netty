@@ -75,8 +75,7 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
     }
 
     /**
-     * The {@link EventLoopGroup} which is used to handle all the events for the to-be-created
-     * {@link Channel}
+     * The {@link EventLoopGroup} which is used to handle all the events for the to-be-created {@link Channel}
      */
     public B group(EventLoopGroup group) {
         if (group == null) {
@@ -326,11 +325,12 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
                 // as the Channel is not registered yet we need to force the usage of the GlobalEventExecutor
                 return new DefaultChannelPromise(channel, GlobalEventExecutor.INSTANCE).setFailure(t);
             }
+
             // as the Channel is not registered yet we need to force the usage of the GlobalEventExecutor
             return new DefaultChannelPromise(new FailedChannel(), GlobalEventExecutor.INSTANCE).setFailure(t);
         }
 
-        ChannelFuture regFuture = config().group().register(channel);
+        ChannelFuture regFuture = config().group().register(channel); //将channel注册给EventLoop
         if (regFuture.cause() != null) {
             if (channel.isRegistered()) {
                 channel.close();

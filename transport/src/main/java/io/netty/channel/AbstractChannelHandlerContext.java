@@ -35,15 +35,13 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 import java.net.SocketAddress;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
-abstract class AbstractChannelHandlerContext extends DefaultAttributeMap
-        implements ChannelHandlerContext, ResourceLeakHint {
+abstract class AbstractChannelHandlerContext extends DefaultAttributeMap implements ChannelHandlerContext, ResourceLeakHint {
 
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(AbstractChannelHandlerContext.class);
-    volatile AbstractChannelHandlerContext next;
-    volatile AbstractChannelHandlerContext prev;
+    volatile AbstractChannelHandlerContext next; //指向下一个ChannelHandler
+    volatile AbstractChannelHandlerContext prev; //指向上一个ChannelHandler
 
-    private static final AtomicIntegerFieldUpdater<AbstractChannelHandlerContext> HANDLER_STATE_UPDATER =
-            AtomicIntegerFieldUpdater.newUpdater(AbstractChannelHandlerContext.class, "handlerState");
+    private static final AtomicIntegerFieldUpdater<AbstractChannelHandlerContext> HANDLER_STATE_UPDATER = AtomicIntegerFieldUpdater.newUpdater(AbstractChannelHandlerContext.class, "handlerState");
 
     /**
      * {@link ChannelHandler#handlerAdded(ChannelHandlerContext)} is about to be called.

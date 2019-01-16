@@ -22,12 +22,13 @@ import io.netty.util.internal.ObjectUtil;
 import io.netty.util.internal.UnstableApi;
 
 /**
+ * 堆内存分配器，对一个ByteBufAllocator的封装
  * Wraps another {@link ByteBufAllocator} and use heapbuffers everywhere except when a direct buffer is explicit
  * requested.
  */
 @UnstableApi
 public final class PreferHeapByteBufAllocator implements ByteBufAllocator {
-    private final ByteBufAllocator allocator;
+    private final ByteBufAllocator allocator; //具体执行分配的allocator。
 
     public PreferHeapByteBufAllocator(ByteBufAllocator allocator) {
         this.allocator = ObjectUtil.checkNotNull(allocator, "allocator");

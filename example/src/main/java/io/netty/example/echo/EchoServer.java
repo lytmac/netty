@@ -57,8 +57,8 @@ public final class EchoServer {
             b.group(bossGroup, workerGroup)                                       //ServerBootstrap设定EventLoopGroup
                     .channel(NioServerSocketChannel.class)                        //指定Channel，因为是Server端，故Channel是ServerSocketChannel，为什么要通过反射来处理呢？
                     .option(ChannelOption.SO_BACKLOG, 100)                 //指定内核backlog的长度
-                    .handler(new LoggingHandler(LogLevel.INFO))                   //指定BossGroup的Handler
-                    .childHandler(new ChannelInitializer<SocketChannel>() {       //指定workerGroup的Handler
+                    .handler(new LoggingHandler(LogLevel.INFO))                   //指定Bootstrap().handler
+                    .childHandler(new ChannelInitializer<SocketChannel>() {       //指定ServerBootstrap(子类).handler
                         @Override
                         public void initChannel(SocketChannel ch) throws Exception {
                             ChannelPipeline p = ch.pipeline();
@@ -70,7 +70,7 @@ public final class EchoServer {
                         }
                     });
 
-            // Start the server.
+            // Start the server. 绑定监听端口并启动服务器
             ChannelFuture f = b.bind(PORT).sync();
 
             // Wait until the server socket is closed.
